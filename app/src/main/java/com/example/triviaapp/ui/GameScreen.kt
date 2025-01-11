@@ -1,8 +1,8 @@
 package com.example.triviaapp.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,12 +15,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.triviaapp.model.Question
@@ -35,16 +38,30 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
     Scaffold (
         topBar = {
             // Game top bar
-            TopAppBar(
-                title = { Text("Trivia App") },)
+            TopAppBar (
+                title = { Text("Trivia App") },
+                colors = TopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    scrolledContainerColor = MaterialTheme.colorScheme.primary,
+                )
+            )
         },
         bottomBar = {
             // Game bottom bar
             BottomAppBar (
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
             ){
-                Text("Questions: ${gameViewState.currentQuestionIndex + 1}/${gameViewState.numberOfQuestions}")
-                Spacer(modifier = Modifier.weight(1f))
-                Text("Correct Answers: ${gameViewState.correctAnswers}")
+                Row (
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Questions: ${gameViewState.currentQuestionIndex + 1}/${gameViewState.numberOfQuestions}")
+                    Text("Correct Answers: ${gameViewState.correctAnswers}")
+                }
             }
 
         }
@@ -88,7 +105,9 @@ fun GameZone(question: Question?, questionResponsed : Boolean, onAnswerSelected:
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Game question
-        Text(question?.question ?: "No question found")
+        Text(question?.question ?: "No question found",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.primary)
         // Game options
         question?.options?.forEach { option ->
             Button(
@@ -125,4 +144,10 @@ fun GameZone(question: Question?, questionResponsed : Boolean, onAnswerSelected:
         }
     }
 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    GameScreen()
 }
