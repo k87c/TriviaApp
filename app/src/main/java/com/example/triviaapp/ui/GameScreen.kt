@@ -3,24 +3,31 @@ package com.example.triviaapp.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.triviaapp.model.Question
 import com.example.triviaapp.ui.theme.GameUiState
 import com.example.triviaapp.ui.theme.GameViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
     val gameViewState by gameViewModel.gameViewState.collectAsState()
@@ -28,6 +35,18 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
     Scaffold (
         topBar = {
             // Game top bar
+            TopAppBar(
+                title = { Text("Trivia App") },)
+        },
+        bottomBar = {
+            // Game bottom bar
+            BottomAppBar (
+            ){
+                Text("Questions: ${gameViewState.currentQuestionIndex + 1}/${gameViewState.numberOfQuestions}")
+                Spacer(modifier = Modifier.weight(1f))
+                Text("Correct Answers: ${gameViewState.correctAnswers}")
+            }
+
         }
     ) {
         // Game content
@@ -63,7 +82,11 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
 @Composable
 fun GameZone(question: Question?, questionResponsed : Boolean, onAnswerSelected: (String) -> Unit, onNextQuestion: () -> Unit) {
     // Game zone
-    Column {
+    Column (
+        modifier = Modifier.padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         // Game question
         Text(question?.question ?: "No question found")
         // Game options
@@ -71,9 +94,15 @@ fun GameZone(question: Question?, questionResponsed : Boolean, onAnswerSelected:
             Button(
                 onClick = { onAnswerSelected(option) },
                 modifier = Modifier.padding(8.dp)
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primary),
-
+                    .fillMaxWidth(),
+                colors = ButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    disabledContentColor = MaterialTheme.colorScheme.onSecondary,
+                    disabledContainerColor = (if (
+                        questionResponsed && option == question.correctAnswer
+                    ) Color.Green else Color.Red).copy(alpha = 0.5f),
+                ),
                 enabled = questionResponsed.not()
             ) {
                 Text(option)
@@ -83,9 +112,14 @@ fun GameZone(question: Question?, questionResponsed : Boolean, onAnswerSelected:
         Button(
             onClick = { onNextQuestion() },
             modifier = Modifier.padding(8.dp)
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.secondary),
-            enabled = questionResponsed
+                .fillMaxWidth(),
+            enabled = questionResponsed,
+            colors = ButtonColors(
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.primary,
+                disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+                disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+            )
         ) {
             Text("Next")
         }

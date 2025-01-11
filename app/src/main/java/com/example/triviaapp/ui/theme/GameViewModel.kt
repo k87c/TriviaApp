@@ -39,14 +39,19 @@ class GameViewModel : ViewModel() {
             uiState = GameUiState.Success,
             questions = getQuestions(_gameViewState.value.numberOfQuestions),
             currentQuestionIndex = 0,
+            correctAnswers = 0,
+            questionResposed = false,
+            currentQuestion = getQuestions(_gameViewState.value.numberOfQuestions).firstOrNull(),
         )
     }
 
     fun onAnswerSelected(answer: String) {
         val currentQuestion = _gameViewState.value.questions.getOrNull(_gameViewState.value.currentQuestionIndex)
         if (currentQuestion != null) {
-            val question = currentQuestion
-            val correctAnswers = _gameViewState.value.correctAnswers + if (question.validateAnswer(answer)) 1 else 0
+            val correctAnswers = _gameViewState.value.correctAnswers + if (currentQuestion.validateAnswer(
+                    answer
+                )
+            ) 1 else 0
             _gameViewState.value = _gameViewState.value.copy(
                 correctAnswers = correctAnswers,
                 questionResposed = true,
@@ -58,6 +63,8 @@ class GameViewModel : ViewModel() {
         val currentQuestionIndex = _gameViewState.value.currentQuestionIndex + 1
         if (currentQuestionIndex < _gameViewState.value.numberOfQuestions) {
             _gameViewState.value = _gameViewState.value.copy(
+                currentQuestionIndex = currentQuestionIndex,
+                currentQuestion = _gameViewState.value.questions.getOrNull(currentQuestionIndex),
                 questionResposed = false,
             )
         }
