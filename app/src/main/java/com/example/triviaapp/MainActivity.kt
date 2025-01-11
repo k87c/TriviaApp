@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.triviaapp.ui.GameScreen
+import com.example.triviaapp.ui.navigation.AppNavigation
 import com.example.triviaapp.ui.theme.TriviaAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TriviaAppTheme {
-                GameScreen()
+                AppNavigation()
             }
         }
     }

@@ -1,9 +1,8 @@
-package com.example.triviaapp.ui
+package com.example.triviaapp.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,12 +26,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.triviaapp.model.Question
-import com.example.triviaapp.ui.theme.GameUiState
-import com.example.triviaapp.ui.theme.GameViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
+fun GameScreen(
+    quantity: Int = 5,
+    record: Int = 0,
+    onBackToHome: (Int) -> Unit,
+) {
+    // Game view model
+    val gameViewModel: GameViewModel = GameViewModel(quantity, record)
     val gameViewState by gameViewModel.gameViewState.collectAsState()
 
     Scaffold (
@@ -59,11 +62,11 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Questions: ${gameViewState.currentQuestionIndex + 1}/${gameViewState.numberOfQuestions}")
-                    Text("Correct Answers: ${gameViewState.correctAnswers}")
+                    Text("Question: ${gameViewState.currentQuestionIndex + 1}/${gameViewState.numberOfQuestions}")
+                    Text("Correct Answers: ${gameViewState.correctPercentage} %",
+                        fontWeight = FontWeight.Bold)
                 }
             }
-
         }
     ) {
         // Game content
@@ -86,9 +89,13 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                     // Game state
                     GameZone(
                         question = gameViewState.currentQuestion,
-                        questionResponsed = gameViewState.questionResposed,
+                        questionReplied = gameViewState.questionReplied,
+                        gameFinished = gameViewState.gameFinished,
+                        newRecord = gameViewState.newRecord,
                         onAnswerSelected = { answer: String -> gameViewModel.onAnswerSelected(answer) },
-                        onNextQuestion = { gameViewModel.onNextQuestion() }
+                        onNextQuestion = { gameViewModel.onNextQuestion()},
+                        onRestartGame = { gameViewModel.onRestartGame() },
+                        onBackToHome = { onBackToHome(gameViewState.actualRecord) },
                     )
                 }
             }
@@ -97,7 +104,16 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
 }
 
 @Composable
-fun GameZone(question: Question?, questionResponsed : Boolean, onAnswerSelected: (String) -> Unit, onNextQuestion: () -> Unit) {
+fun GameZone(
+    question: Question?,
+    questionReplied : Boolean,
+    gameFinished: Boolean,
+    newRecord: Boolean,
+    onAnswerSelected: (String) -> Unit,
+    onNextQuestion: () -> Unit,
+    onBackToHome: () -> Unit,
+    onRestartGame: () -> Unit
+) {
     // Game zone
     Column (
         modifier = Modifier.padding(16.dp),
@@ -119,28 +135,51 @@ fun GameZone(question: Question?, questionResponsed : Boolean, onAnswerSelected:
                     containerColor = MaterialTheme.colorScheme.secondary,
                     disabledContentColor = MaterialTheme.colorScheme.onSecondary,
                     disabledContainerColor = (if (
-                        questionResponsed && option == question.correctAnswer
+                        questionReplied && option == question.correctAnswer
                     ) Color.Green else Color.Red).copy(alpha = 0.5f),
                 ),
-                enabled = questionResponsed.not()
+                enabled = questionReplied.not()
             ) {
                 Text(option)
             }
         }
-        // Next button
-        Button(
-            onClick = { onNextQuestion() },
-            modifier = Modifier.padding(8.dp)
-                .fillMaxWidth(),
-            enabled = questionResponsed,
-            colors = ButtonColors(
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                containerColor = MaterialTheme.colorScheme.primary,
-                disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
-                disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-            )
-        ) {
-            Text("Next")
+        if (gameFinished) {
+            // Game finished message
+            Text("Game finished!",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary)
+            if (newRecord) {
+                // New record message
+                Text("New record!",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.secondary)
+            }
+            Button(
+                onClick = { onRestartGame() }
+            ) {
+                Text("Try Again")
+            }
+            Button(
+                onClick = { onBackToHome() }
+            ) {
+                Text("Back to Home")
+            }
+        } else {
+            // Next button
+            Button(
+                onClick = { onNextQuestion() },
+                modifier = Modifier.padding(8.dp)
+                    .fillMaxWidth(),
+                enabled = questionReplied,
+                colors = ButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+                    disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                )
+            ) {
+                Text("Next")
+            }
         }
     }
 
@@ -149,5 +188,7 @@ fun GameZone(question: Question?, questionResponsed : Boolean, onAnswerSelected:
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    GameScreen()
+    GameScreen(
+        onBackToHome = {},
+    )
 }
