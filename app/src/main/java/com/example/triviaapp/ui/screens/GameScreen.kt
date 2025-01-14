@@ -1,18 +1,26 @@
 package com.example.triviaapp.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
@@ -20,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,15 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.triviaapp.model.Question
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(
-    quantity: Int = 5,
-    record: Int = 0,
-    onBackToHome: (Int) -> Unit,
+    gameViewModel: GameViewModel = viewModel(),
 ) {
     // Game view model
-    val gameViewModel: GameViewModel = GameViewModel(quantity, record)
     val gameViewState by gameViewModel.gameViewState.collectAsState()
 
     Scaffold (
@@ -54,17 +62,21 @@ fun GameScreen(
         },
         bottomBar = {
             // Game bottom bar
-            BottomAppBar (
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ){
-                Row (
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+            if (gameViewState.uiState == GameUiState.Success) {
+                BottomAppBar(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                 ) {
-                    Text("Question: ${gameViewState.currentQuestionIndex + 1}/${gameViewState.numberOfQuestions}")
-                    Text("Correct Answers: ${gameViewState.correctPercentage} %",
-                        fontWeight = FontWeight.Bold)
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Question: ${gameViewState.currentQuestionIndex + 1}/${gameViewState.numberOfQuestions}")
+                        Text(
+                            "Correct Answers: ${gameViewState.currentPercentage} %",
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
@@ -77,6 +89,16 @@ fun GameScreen(
         ) {
             // Game UI
             when (gameViewState.uiState) {
+                GameUiState.Home -> {
+                    // Home state
+                    HomeScreen(
+                        increseQuantity = { gameViewModel.increaseQuantity() },
+                        decreaseQuantity = { gameViewModel.decreaseQuantity() },
+                        quantity = gameViewState.numberOfQuestions,
+                        onStartGame = { quantity: Int -> gameViewModel.loadQuestions(quantity) },
+                        record = gameViewState.actualRecord,
+                    )
+                }
                 GameUiState.Loading -> {
                     // Loading state
                     Text("Loading...")
@@ -92,10 +114,11 @@ fun GameScreen(
                         questionReplied = gameViewState.questionReplied,
                         gameFinished = gameViewState.gameFinished,
                         newRecord = gameViewState.newRecord,
+                        currentPercentage = gameViewState.currentPercentage,
                         onAnswerSelected = { answer: String -> gameViewModel.onAnswerSelected(answer) },
                         onNextQuestion = { gameViewModel.onNextQuestion()},
                         onRestartGame = { gameViewModel.onRestartGame() },
-                        onBackToHome = { onBackToHome(gameViewState.actualRecord) },
+                        onBackToHome = { gameViewModel.onBackToHome() },
                     )
                 }
             }
@@ -109,10 +132,11 @@ fun GameZone(
     questionReplied : Boolean,
     gameFinished: Boolean,
     newRecord: Boolean,
+    currentPercentage: Int = 0,
     onAnswerSelected: (String) -> Unit,
     onNextQuestion: () -> Unit,
+    onRestartGame: () -> Unit,
     onBackToHome: () -> Unit,
-    onRestartGame: () -> Unit
 ) {
     // Game zone
     Column (
@@ -144,26 +168,13 @@ fun GameZone(
             }
         }
         if (gameFinished) {
-            // Game finished message
-            Text("Game finished!",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary)
-            if (newRecord) {
-                // New record message
-                Text("New record!",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.secondary)
-            }
-            Button(
-                onClick = { onRestartGame() }
-            ) {
-                Text("Try Again")
-            }
-            Button(
-                onClick = { onBackToHome() }
-            ) {
-                Text("Back to Home")
-            }
+            // Final score dialog
+            FinalScoreDialog(
+                score = currentPercentage,
+                newRecord = newRecord,
+                onRestartGame = onRestartGame,
+                onBackToHome = { onBackToHome() },
+            )
         } else {
             // Next button
             Button(
@@ -182,13 +193,79 @@ fun GameZone(
             }
         }
     }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FinalScoreDialog(
+    score: Int,
+    newRecord: Boolean,
+    onRestartGame: () -> Unit,
+    onBackToHome: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    BasicAlertDialog(
+        onDismissRequest = { onBackToHome() },
+        modifier = Modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface),
+        ) {
+
+        Surface (
+            modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+            shape = MaterialTheme.shapes.large,
+            tonalElevation = AlertDialogDefaults.TonalElevation
+        ) {
+            Column(
+                modifier = modifier.padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Text("Game finished!", style = MaterialTheme.typography.titleLarge)
+                Text("Your score: $score %", style = MaterialTheme.typography.titleMedium)
+                if (newRecord) {
+                    Text(
+                        "New record!",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextButton(
+                        onClick = { onRestartGame() },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Try Again")
+                    }
+                    TextButton(
+                        onClick = { onBackToHome() },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Go to Home")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FinalScoreDialogPreview() {
+    FinalScoreDialog(
+        score = 100,
+        newRecord = true,
+        onRestartGame = {},
+        onBackToHome = {},
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    GameScreen(
-        onBackToHome = {},
-    )
+    GameScreen()
 }

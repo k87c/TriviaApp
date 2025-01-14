@@ -14,10 +14,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,10 +21,12 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeScreen(
-    onStartGame: (Int, Int) -> Unit,
+    increseQuantity: () -> Unit,
+    decreaseQuantity: () -> Unit,
+    quantity: Int = 5,
+    onStartGame: (Int) -> Unit,
     record: Int = 0,
 ) {
-    var quantity by remember { mutableIntStateOf(5) }
     // Home screen content
     Column (
         // Column content alignment
@@ -45,7 +43,7 @@ fun HomeScreen(
         )
         {
             IconButton(
-                onClick = { quantity = maxOf(5, quantity - 1) }
+                onClick = decreaseQuantity
             ) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
@@ -54,7 +52,7 @@ fun HomeScreen(
             }
             Text("Questions: $quantity")
             IconButton(
-                onClick = { quantity = minOf(20, quantity + 1) }
+                onClick = increseQuantity
             ) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowUp,
@@ -65,7 +63,7 @@ fun HomeScreen(
         // Start game button
         Button(
             onClick = {
-                onStartGame(quantity, record)
+                onStartGame(quantity)
             },
             modifier = Modifier.padding(top = 16.dp)
         ) {
@@ -81,7 +79,8 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
-        onStartGame = TODO(),
-        record = TODO()
+        increseQuantity = {},
+        decreaseQuantity = {},
+        onStartGame = {},
     )
 }

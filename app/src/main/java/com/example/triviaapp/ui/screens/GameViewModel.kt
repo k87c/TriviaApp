@@ -13,6 +13,7 @@ sealed interface GameUiState {
     data object Loading : GameUiState
     data class Error(val message: String) : GameUiState
     data object Success : GameUiState
+    data object Home : GameUiState
 }
 
 data class GameViewState(
@@ -23,32 +24,31 @@ data class GameViewState(
     val numberOfQuestions: Int = 5,
     val questionReplied: Boolean = false,
     val currentQuestion: Question? = null,
-    val correctPercentage: Int = 0,
+    val currentPercentage: Int = 0,
     val actualRecord: Int = 0,
     val gameFinished: Boolean = false,
     val newRecord: Boolean = false,
 )
-class GameViewModel(quantity: Int, record: Int) : ViewModel() {
+class GameViewModel() : ViewModel() {
     // Game UI State
     private val _gameViewState = MutableStateFlow(GameViewState())
     val gameViewState: StateFlow<GameViewState> = _gameViewState.asStateFlow()
 
     init {
-        loadQuestions(quantity, record)
+        _gameViewState.value = _gameViewState.value.copy(uiState = GameUiState.Home)
     }
 
-    fun loadQuestions(quantity: Int, record: Int) {
+    fun loadQuestions(quantity: Int) {
         _gameViewState.value = _gameViewState.value.copy(uiState = GameUiState.Loading)
         val questions = getQuestions(quantity)
         _gameViewState.value = _gameViewState.value.copy(
             uiState = GameUiState.Success,
             numberOfQuestions = quantity,
-            actualRecord = record,
             questions = questions,
             currentQuestionIndex = 0,
             correctAnswers = 0,
             questionReplied = false,
-            correctPercentage = 0,
+            currentPercentage = 0,
             gameFinished = false,
             newRecord = false,
             currentQuestion = questions.firstOrNull(),
@@ -65,7 +65,7 @@ class GameViewModel(quantity: Int, record: Int) : ViewModel() {
                 ) 1 else 0
                 _gameViewState.value = _gameViewState.value.copy(
                     correctAnswers = correctAnswers,
-                    correctPercentage = correctAnswers * 100 / (_gameViewState.value.currentQuestionIndex + 1),
+                    currentPercentage = correctAnswers * 100 / (_gameViewState.value.currentQuestionIndex + 1),
                     questionReplied = true,
                 )
             }
@@ -83,9 +83,9 @@ class GameViewModel(quantity: Int, record: Int) : ViewModel() {
                 )
             } else {
                 _gameViewState.value = _gameViewState.value.copy(gameFinished = true)
-                if (_gameViewState.value.correctPercentage > _gameViewState.value.actualRecord) {
+                if (_gameViewState.value.currentPercentage > _gameViewState.value.actualRecord) {
                     _gameViewState.value = _gameViewState.value.copy(
-                        actualRecord = _gameViewState.value.correctPercentage,
+                        actualRecord = _gameViewState.value.currentPercentage,
                         newRecord = true,
                     )
                 }
@@ -94,14 +94,18 @@ class GameViewModel(quantity: Int, record: Int) : ViewModel() {
     }
 
     fun onRestartGame() {
-        loadQuestions(_gameViewState.value.numberOfQuestions, _gameViewState.value.actualRecord)
+        loadQuestions(_gameViewState.value.numberOfQuestions)
     }
 
-    fun lessQuestions() {
+    fun decreaseQuantity() {
         if (_gameViewState.value.numberOfQuestions > 5) _gameViewState.value = _gameViewState.value.copy(numberOfQuestions = _gameViewState.value.numberOfQuestions - 1)
     }
 
-    fun moreQuestions() {
+    fun increaseQuantity() {
         if(_gameViewState.value.numberOfQuestions < 20) _gameViewState.value = _gameViewState.value.copy(numberOfQuestions = _gameViewState.value.numberOfQuestions + 1)
+    }
+
+    fun onBackToHome() {
+        _gameViewState.value = _gameViewState.value.copy(uiState = GameUiState.Home)
     }
 }
