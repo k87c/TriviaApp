@@ -2,145 +2,150 @@ package com.example.triviaapp.data
 
 import com.example.triviaapp.model.Question
 
+/*
+* This is a list of questions that will be used in the app.
+* En esta versión de la app este archivo ya no se usa, ya que las preguntas se obtienen de una API.
+ */
+
 val questions = listOf(
     Question(
-        question = "What is the capital of Australia?",
-        options = listOf("Sydney", "Melbourne", "Canberra", "Perth"),
-        correctAnswer = "Canberra"
+        "What is the capital of Australia?",
+        listOf("Sydney", "Melbourne", "Canberra", "Perth"),
+        "Canberra"
     ),
     Question(
-        question = "What is the capital of France?",
-        options = listOf("London", "Paris", "Berlin", "Madrid"),
-        correctAnswer = "Paris"
+         "What is the capital of France?",
+         listOf("London", "Paris", "Berlin", "Madrid"),
+         "Paris"
     ),
     Question(
-        question = "What is the capital of Japan?",
-        options = listOf("Beijing", "Tokyo", "Seoul", "Bangkok"),
-        correctAnswer = "Tokyo"
+         "What is the capital of Japan?",
+         listOf("Beijing", "Tokyo", "Seoul", "Bangkok"),
+         "Tokyo"
     ),
     Question(
-        question = "What is the capital of India?",
-        options = listOf("New Delhi", "Mumbai", "Kolkata", "Chennai"),
-        correctAnswer = "New Delhi"
+         "What is the capital of India?",
+         listOf("New Delhi", "Mumbai", "Kolkata", "Chennai"),
+         "New Delhi"
     ),
     Question(
-        question = "What is the capital of Brazil?",
-        options = listOf("Sao Paulo", "Brasilia", "Rio de Janeiro", "Salvador"),
-        correctAnswer = "Brasilia"
+         "What is the capital of Brazil?",
+         listOf("Sao Paulo", "Brasilia", "Rio de Janeiro", "Salvador"),
+         "Brasilia"
     ),
     Question(
-        question = "What is the capital of Canada?",
-        options = listOf("Toronto", "Vancouver", "Ottawa", "Montreal"),
-        correctAnswer = "Ottawa"
+         "What is the capital of Canada?",
+         listOf("Toronto", "Vancouver", "Ottawa", "Montreal"),
+         "Ottawa"
     ),
     Question(
-        question = "What is the capital of South Korea?",
-        options = listOf("Busan", "Seoul", "Incheon", "Daegu"),
-        correctAnswer = "Seoul"
+         "What is the capital of South Korea?",
+         listOf("Busan", "Seoul", "Incheon", "Daegu"),
+         "Seoul"
     ),
     Question(
-        question = "What is the capital of Russia?",
-        options = listOf("Moscow", "Saint Petersburg", "Novosibirsk", "Yekaterinburg"),
-        correctAnswer = "Moscow"
+         "What is the capital of Russia?",
+         listOf("Moscow", "Saint Petersburg", "Novosibirsk", "Yekaterinburg"),
+         "Moscow"
     ),
     Question(
-        question = "What is the capital of South Africa?",
-        options = listOf("Johannesburg", "Cape Town", "Durban", "Pretoria"),
-        correctAnswer = "Pretoria"
+         "What is the capital of South Africa?",
+         listOf("Johannesburg", "Cape Town", "Durban", "Pretoria"),
+         "Pretoria"
     ),
     Question(
-        question = "What is the capital of Mexico?",
-        options = listOf("Guadalajara", "Monterrey", "Mexico City", "Puebla"),
-        correctAnswer = "Mexico City"
+         "What is the capital of Mexico?",
+         listOf("Guadalajara", "Monterrey", "Mexico City", "Puebla"),
+         "Mexico City"
     ),
     Question(
-        question = "What is the capital of Argentina?",
-        options = listOf("Buenos Aires", "Cordoba", "Rosario", "Mendoza"),
-        correctAnswer = "Buenos Aires"
+         "What is the capital of Argentina?",
+         listOf("Buenos Aires", "Cordoba", "Rosario", "Mendoza"),
+         "Buenos Aires"
     ),
     Question(
-        question = "What is the capital of Egypt?",
-        options = listOf("Alexandria", "Giza", "Cairo", "Luxor"),
-        correctAnswer = "Cairo"
+         "What is the capital of Egypt?",
+         listOf("Alexandria", "Giza", "Cairo", "Luxor"),
+         "Cairo"
     ),
     Question(
-        question = "What is the capital of Italy?",
-        options = listOf("Milan", "Rome", "Naples", "Turin"),
-        correctAnswer = "Rome"
+         "What is the capital of Italy?",
+         listOf("Milan", "Rome", "Naples", "Turin"),
+         "Rome"
     ),
     Question(
-        question = "What is the capital of Germany?",
-        options = listOf("Berlin", "Hamburg", "Munich", "Cologne"),
-        correctAnswer = "Berlin"
+         "What is the capital of Germany?",
+         listOf("Berlin", "Hamburg", "Munich", "Cologne"),
+         "Berlin"
     ),
     Question(
-        question = "What is the capital of Spain?",
-        options = listOf("Barcelona", "Madrid", "Valencia", "Seville"),
-        correctAnswer = "Madrid"
+         "What is the capital of Spain?",
+         listOf("Barcelona", "Madrid", "Valencia", "Seville"),
+         "Madrid"
     ),
     Question(
-        question = "What is the capital of Indonesia?",
-        options = listOf("Jakarta", "Surabaya", "Bandung", "Medan"),
-        correctAnswer = "Jakarta"
+         "What is the capital of Indonesia?",
+         listOf("Jakarta", "Surabaya", "Bandung", "Medan"),
+         "Jakarta"
     ),
     Question(
-        question = "What is the capital of Turkey?",
-        options = listOf("Istanbul", "Ankara", "Izmir", "Bursa"),
-        correctAnswer = "Ankara"
+         "What is the capital of Turkey?",
+         listOf("Istanbul", "Ankara", "Izmir", "Bursa"),
+         "Ankara"
     ),
     Question(
-        question = "What is the capital of Thailand?",
-        options = listOf("Bangkok", "Chiang Mai", "Phuket", "Pattaya"),
-        correctAnswer = "Bangkok"
+         "What is the capital of Thailand?",
+         listOf("Bangkok", "Chiang Mai", "Phuket", "Pattaya"),
+         "Bangkok"
     ),
     Question(
-        question = "What is the capital of Saudi Arabia?",
-        options = listOf("Jeddah", "Mecca", "Medina", "Riyadh"),
-        correctAnswer = "Riyadh"
+         "What is the capital of Saudi Arabia?",
+         listOf("Jeddah", "Mecca", "Medina", "Riyadh"),
+         "Riyadh"
     ),
     Question(
-        question = "What is the capital of Nigeria?",
-        options = listOf("Lagos", "Kano", "Ibadan", "Abuja"),
-        correctAnswer = "Abuja"
+         "What is the capital of Nigeria?",
+         listOf("Lagos", "Kano", "Ibadan", "Abuja"),
+         "Abuja"
     ),
     Question(
-        question = "What is the capital of Pakistan?",
-        options = listOf("Karachi", "Lahore", "Islamabad", "Faisalabad"),
-        correctAnswer = "Islamabad"
+         "What is the capital of Pakistan?",
+         listOf("Karachi", "Lahore", "Islamabad", "Faisalabad"),
+         "Islamabad"
     ),
     Question(
-        question = "What is the capital of Bangladesh?",
-        options = listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi"),
-        correctAnswer = "Dhaka"
+         "What is the capital of Bangladesh?",
+         listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi"),
+         "Dhaka"
     ),
     Question(
-        question = "What is the capital of Vietnam?",
-        options = listOf("Ho Chi Minh City", "Hanoi", "Da Nang", "Hai Phong"),
-        correctAnswer = "Hanoi"
+         "What is the capital of Vietnam?",
+         listOf("Ho Chi Minh City", "Hanoi", "Da Nang", "Hai Phong"),
+         "Hanoi"
     ),
     Question(
-        question = "What is the capital of the Philippines?",
-        options = listOf("Manila", "Quezon City", "Cebu City", "Davao City"),
-        correctAnswer = "Manila"
+         "What is the capital of the Philippines?",
+         listOf("Manila", "Quezon City", "Cebu City", "Davao City"),
+         "Manila"
     ),
     Question(
-        question = "What is the capital of Iran?",
-        options = listOf("Tehran", "Mashhad", "Isfahan", "Tabriz"),
-        correctAnswer = "Tehran"
+         "What is the capital of Iran?",
+         listOf("Tehran", "Mashhad", "Isfahan", "Tabriz"),
+         "Tehran"
     ),
     Question(
-        question = "What is the capital of Iraq?",
-        options = listOf("Baghdad", "Basra", "Erbil", "Mosul"),
-        correctAnswer = "Baghdad"
+         "What is the capital of Iraq?",
+         listOf("Baghdad", "Basra", "Erbil", "Mosul"),
+         "Baghdad"
     ),
     Question(
-        question = "What is the capital of Afghanistan?",
-        options = listOf("Kabul", "Kandahar", "Herat", "Mazar-i-Sharif"),
-        correctAnswer = "Kabul"
+         "What is the capital of Afghanistan?",
+         listOf("Kabul", "Kandahar", "Herat", "Mazar-i-Sharif"),
+         "Kabul"
     ),
     Question(
-        question = "What is the capital of the United States?",
-        options = listOf("New York City", "Los Angeles", "Chicago", "Washington D.C."),
-        correctAnswer = "Washington D.C."
+         "What is the capital of the United States?",
+         listOf("New York City", "Los Angeles", "Chicago", "Washington D.C."),
+         "Washington D.C."
     ),
 )

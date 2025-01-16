@@ -41,7 +41,7 @@ import com.example.triviaapp.model.Question
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(
-    gameViewModel: GameViewModel = viewModel(),
+    gameViewModel: GameViewModel = viewModel(factory = GameViewModel.Factory),
 ) {
     // Game view model
     val gameViewState by gameViewModel.gameViewState.collectAsState()

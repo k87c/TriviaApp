@@ -1,7 +1,13 @@
 package com.example.triviaapp.ui.screens
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.triviaapp.TriviaApplication
+import com.example.triviaapp.data.QuestionRepository
 import com.example.triviaapp.model.Question
 import com.example.triviaapp.model.getQuestions
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,30 +35,36 @@ data class GameViewState(
     val gameFinished: Boolean = false,
     val newRecord: Boolean = false,
 )
-class GameViewModel() : ViewModel() {
+
+
+class GameViewModel(private val questionRepository: QuestionRepository) : ViewModel() {
     // Game UI State
     private val _gameViewState = MutableStateFlow(GameViewState())
     val gameViewState: StateFlow<GameViewState> = _gameViewState.asStateFlow()
+
 
     init {
         _gameViewState.value = _gameViewState.value.copy(uiState = GameUiState.Home)
     }
 
     fun loadQuestions(quantity: Int) {
-        _gameViewState.value = _gameViewState.value.copy(uiState = GameUiState.Loading)
-        val questions = getQuestions(quantity)
-        _gameViewState.value = _gameViewState.value.copy(
-            uiState = GameUiState.Success,
-            numberOfQuestions = quantity,
-            questions = questions,
-            currentQuestionIndex = 0,
-            correctAnswers = 0,
-            questionReplied = false,
-            currentPercentage = 0,
-            gameFinished = false,
-            newRecord = false,
-            currentQuestion = questions.firstOrNull(),
-        )
+        viewModelScope.launch {
+            _gameViewState.value = _gameViewState.value.copy(uiState = GameUiState.Loading)
+            // val questions = getQuestions(quantity)
+            val questions = questionRepository.getQuestions(quantity).map { it.toQuestion() }
+            _gameViewState.value = _gameViewState.value.copy(
+                uiState = GameUiState.Success,
+                numberOfQuestions = quantity,
+                questions = questions,
+                currentQuestionIndex = 0,
+                correctAnswers = 0,
+                questionReplied = false,
+                currentPercentage = 0,
+                gameFinished = false,
+                newRecord = false,
+                currentQuestion = questions.firstOrNull(),
+            )
+        }
     }
 
     fun onAnswerSelected(answer: String) {
@@ -107,5 +119,28 @@ class GameViewModel() : ViewModel() {
 
     fun onBackToHome() {
         _gameViewState.value = _gameViewState.value.copy(uiState = GameUiState.Home)
+    }
+
+
+    // ViewModel Factory
+    /*
+    Explicación de la función viewModelFactory:
+    - Esta función crea un ViewModelProvider.Factory que inicializa un GameViewModel.
+    - La función initializer se encarga de inicializar el GameViewModel con el QuestionRepository.
+    - La función viewModelFactory recibe un lambda que retorna un ViewModelProvider.Factory.
+    - El lambda recibe un mapa de parámetros y retorna un ViewModel.
+    - En este caso, el lambda recibe un mapa con un parámetro APPLICATION_KEY que es un TriviaApplication.
+    - El ViewModel se inicializa con el QuestionRepository obtenido del TriviaApplication.
+    Este companion object es necesario para poder crear un ViewModelProvider.Factory que inicialice un GameViewModel.
+    La palabra reservada companion object permite definir un objeto que es parte de la clase GameViewModel.
+     */
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as TriviaApplication)
+                val questionRepository = application.container.questionRepository
+                GameViewModel(questionRepository)
+            }
+        }
     }
 }
