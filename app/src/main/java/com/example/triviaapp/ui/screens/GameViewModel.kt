@@ -8,11 +8,13 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.triviaapp.TriviaApplication
 import com.example.triviaapp.data.QuestionRepository
+import com.example.triviaapp.data.TriviaPreferencesRepository
 import com.example.triviaapp.model.Question
 import com.example.triviaapp.model.getQuestions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 sealed interface GameUiState {
@@ -37,13 +39,22 @@ data class GameViewState(
 )
 
 
-class GameViewModel(private val questionRepository: QuestionRepository) : ViewModel() {
+class GameViewModel(
+    private val questionRepository: QuestionRepository,
+    private val triviaPreferencesRepository: TriviaPreferencesRepository
+) : ViewModel() {
     // Game UI State
     private val _gameViewState = MutableStateFlow(GameViewState())
     val gameViewState: StateFlow<GameViewState> = _gameViewState.asStateFlow()
 
 
     init {
+        // Load the record from the preferences
+        viewModelScope.launch {
+            val record = triviaPreferencesRepository.recordFlow.first()
+            _gameViewState.value = _gameViewState.value.copy(actualRecord = record)
+        }
+        // Set the initial state to Home
         _gameViewState.value = _gameViewState.value.copy(uiState = GameUiState.Home)
     }
 
@@ -100,6 +111,7 @@ class GameViewModel(private val questionRepository: QuestionRepository) : ViewMo
                         actualRecord = _gameViewState.value.currentPercentage,
                         newRecord = true,
                     )
+                    triviaPreferencesRepository.writeTriviaPreferences(_gameViewState.value.currentPercentage)
                 }
             }
         }
@@ -139,7 +151,8 @@ class GameViewModel(private val questionRepository: QuestionRepository) : ViewMo
             initializer {
                 val application = (this[APPLICATION_KEY] as TriviaApplication)
                 val questionRepository = application.container.questionRepository
-                GameViewModel(questionRepository)
+                val triviaPreferencesRepository = application.triviaPreferencesRepository
+                GameViewModel(questionRepository, triviaPreferencesRepository)
             }
         }
     }

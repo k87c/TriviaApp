@@ -1,8 +1,13 @@
 package com.example.triviaapp
 
 import android.app.Application
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.triviaapp.data.AppContainer
 import com.example.triviaapp.data.DefaultAppcontainer
+import com.example.triviaapp.data.TriviaPreferencesRepository
 
 /**
  * Application class for the Trivia app
@@ -27,9 +32,17 @@ import com.example.triviaapp.data.DefaultAppcontainer
 
 class TriviaApplication : Application() {
     lateinit var container: AppContainer
+    lateinit var triviaPreferencesRepository: TriviaPreferencesRepository
 
     override fun onCreate() {
         super.onCreate()
+        triviaPreferencesRepository = TriviaPreferencesRepository(dataStore)
         container = DefaultAppcontainer()
     }
 }
+
+private const val RECORD_PREFERENCES_NAME = "record_preferences"
+
+private val Context.dataStore : DataStore<Preferences> by preferencesDataStore(
+    name = RECORD_PREFERENCES_NAME
+)
