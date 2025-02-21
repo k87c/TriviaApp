@@ -95,7 +95,16 @@ fun GameScreen(
                         increseQuantity = { gameViewModel.increaseQuantity() },
                         decreaseQuantity = { gameViewModel.decreaseQuantity() },
                         quantity = gameViewState.numberOfQuestions,
-                        onStartGame = { quantity: Int -> gameViewModel.loadQuestions(quantity) },
+                        playerName = gameViewState.playerName,
+                        onChangePlayerName = { playerName -> gameViewModel.onChangePlayerName(playerName) },
+                        category = gameViewState.category,
+                        onChangeCategory = { category -> gameViewModel.onChangeCategory(category) },
+                        categories = gameViewModel.listOfCategories(),
+                        expanded = gameViewState.expanded,
+                        expandDropDownMenu = { expanded -> gameViewModel.expandDropDownMenu(expanded) },
+                        onStartGame = { playerName: String, quantity: Int, category: Category ->
+                            gameViewModel.loadQuestions(playerName,quantity, category)
+                                      },
                         record = gameViewState.actualRecord,
                     )
                 }

@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.triviaapp.data.AppContainer
 import com.example.triviaapp.data.DefaultAppcontainer
+import com.example.triviaapp.data.GameRepository
 import com.example.triviaapp.data.TriviaPreferencesRepository
 
 /**
@@ -33,11 +34,12 @@ import com.example.triviaapp.data.TriviaPreferencesRepository
 class TriviaApplication : Application() {
     lateinit var container: AppContainer
     lateinit var triviaPreferencesRepository: TriviaPreferencesRepository
+    lateinit var gameRepository: GameRepository
 
     override fun onCreate() {
         super.onCreate()
         triviaPreferencesRepository = TriviaPreferencesRepository(dataStore)
-        container = DefaultAppcontainer()
+        container = DefaultAppcontainer(this)
     }
 }
 

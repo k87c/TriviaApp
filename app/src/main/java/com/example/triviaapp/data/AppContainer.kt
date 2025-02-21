@@ -1,5 +1,6 @@
 package com.example.triviaapp.data
 
+import android.content.Context
 import com.example.triviaapp.network.TriviaApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -12,7 +13,7 @@ interface AppContainer {
     val questionRepository: QuestionRepository
 }
 
-class DefaultAppcontainer: AppContainer {
+class DefaultAppcontainer(context: Context): AppContainer {
     private val baseUrl = "https://opentdb.com/"
 
     private val retrofit: Retrofit = Retrofit.Builder()
@@ -23,4 +24,13 @@ class DefaultAppcontainer: AppContainer {
     private val retrofitService: TriviaApiService by lazy { retrofit.create(TriviaApiService::class.java) }
 
     override val questionRepository: QuestionRepository by lazy { NetworkQuestionsRepository(retrofitService) }
+
+    // Aquí empiezo con la parte de Room
+    private val appDatabase = AppDatabase.getDatabase(context)
+    private val gameDao = appDatabase.gameDao()
+    val gameRepository: GameRepository by lazy { GameRepositoryImpl(gameDao) }
+
+    fun provideGameRepository(): GameRepository {
+        return gameRepository
+    }
 }

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.triviaapp.TriviaApplication
+import com.example.triviaapp.data.GameRepository
 import com.example.triviaapp.data.QuestionRepository
 import com.example.triviaapp.data.TriviaPreferencesRepository
 import com.example.triviaapp.model.Question
@@ -27,6 +28,9 @@ sealed interface GameUiState {
 data class GameViewState(
     val uiState: GameUiState = GameUiState.Loading,
     val questions: List<Question> = emptyList(),
+    val playerName: String = "",
+    val expanded: Boolean = false,
+    val category: Category = categories.first(),
     val currentQuestionIndex: Int = 0,
     val correctAnswers: Int = 0,
     val numberOfQuestions: Int = 5,
@@ -38,10 +42,25 @@ data class GameViewState(
     val newRecord: Boolean = false,
 )
 
+data class Category(
+    val id: Int,
+    val name: String,
+)
+
+val categories = listOf(
+    Category(10, "Books"),
+    Category(11, "Film"),
+    Category(12, "Music"),
+    Category(13, "Musicals & Theatres"),
+    Category(14, "Television"),
+    Category(15, "Video Games"),
+    Category(16, "Board Games"),
+)
 
 class GameViewModel(
     private val questionRepository: QuestionRepository,
-    private val triviaPreferencesRepository: TriviaPreferencesRepository
+    private val triviaPreferencesRepository: TriviaPreferencesRepository,
+    private val gameRepository: GameRepository,
 ) : ViewModel() {
     // Game UI State
     private val _gameViewState = MutableStateFlow(GameViewState())
@@ -58,15 +77,17 @@ class GameViewModel(
         _gameViewState.value = _gameViewState.value.copy(uiState = GameUiState.Home)
     }
 
-    fun loadQuestions(quantity: Int) {
+    fun loadQuestions(playerName: String, quantity: Int, category: Category) {
         viewModelScope.launch {
             _gameViewState.value = _gameViewState.value.copy(uiState = GameUiState.Loading)
             // val questions = getQuestions(quantity)
-            val questions = questionRepository.getQuestions(quantity).map { it.toQuestion() }
+            val questions = questionRepository.getQuestions(quantity, category.id).map { it.toQuestion() }
             _gameViewState.value = _gameViewState.value.copy(
                 uiState = GameUiState.Success,
                 numberOfQuestions = quantity,
                 questions = questions,
+                playerName = playerName,
+                category = category,
                 currentQuestionIndex = 0,
                 correctAnswers = 0,
                 questionReplied = false,
@@ -118,7 +139,7 @@ class GameViewModel(
     }
 
     fun onRestartGame() {
-        loadQuestions(_gameViewState.value.numberOfQuestions)
+        loadQuestions(_gameViewState.value.playerName, _gameViewState.value.numberOfQuestions, _gameViewState.value.category)
     }
 
     fun decreaseQuantity() {
@@ -131,6 +152,23 @@ class GameViewModel(
 
     fun onBackToHome() {
         _gameViewState.value = _gameViewState.value.copy(uiState = GameUiState.Home)
+    }
+
+    fun listOfCategories() = categories
+
+    fun onChangePlayerName(playerName: String) {
+        _gameViewState.value = _gameViewState.value.copy(playerName = playerName)
+    }
+
+    fun onChangeCategory(category: String) {
+        _gameViewState.value = _gameViewState.value.copy(
+            category = categories.first { it.name == category },
+            expanded = false,
+        )
+    }
+
+    fun expandDropDownMenu(expanded: Boolean) {
+        _gameViewState.value = _gameViewState.value.copy(expanded = expanded)
     }
 
 
@@ -152,7 +190,10 @@ class GameViewModel(
                 val application = (this[APPLICATION_KEY] as TriviaApplication)
                 val questionRepository = application.container.questionRepository
                 val triviaPreferencesRepository = application.triviaPreferencesRepository
-                GameViewModel(questionRepository, triviaPreferencesRepository)
+                GameViewModel(
+                    questionRepository = questionRepository,
+                    gameRepository = application.container,
+                     triviaPreferencesRepository = triviaPreferencesRepository)
             }
         }
     }
