@@ -11,6 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 interface AppContainer {
     val questionRepository: QuestionRepository
+    val gameRepository: GameRepository
 }
 
 class DefaultAppcontainer(context: Context): AppContainer {
@@ -28,9 +29,6 @@ class DefaultAppcontainer(context: Context): AppContainer {
     // Aquí empiezo con la parte de Room
     private val appDatabase = AppDatabase.getDatabase(context)
     private val gameDao = appDatabase.gameDao()
-    val gameRepository: GameRepository by lazy { GameRepositoryImpl(gameDao) }
+    override val gameRepository: GameRepository by lazy { GameRepositoryImpl(gameDao) }
 
-    fun provideGameRepository(): GameRepository {
-        return gameRepository
-    }
 }

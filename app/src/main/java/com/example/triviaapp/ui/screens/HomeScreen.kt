@@ -39,6 +39,7 @@ fun HomeScreen(
     expanded: Boolean = false,
     expandDropDownMenu: (Boolean) -> Unit,
     record: Int = 0,
+    onGoToRecords: () -> Unit,
 ) {
     // Home screen content
     Column (
@@ -120,6 +121,12 @@ fun HomeScreen(
         Row {
             Text("Actual record: $record %")
         }
+        TextButton(
+            onClick = { onGoToRecords() },
+            modifier = Modifier.padding(8.dp),
+        ) {
+            Text("See All Records")
+        }
     }
 }
 
@@ -141,5 +148,6 @@ fun HomeScreenPreview() {
         ),
         expanded = false,
         expandDropDownMenu = {},
+        onGoToRecords = {},
     )
 }

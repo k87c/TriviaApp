@@ -34,7 +34,6 @@ import com.example.triviaapp.data.TriviaPreferencesRepository
 class TriviaApplication : Application() {
     lateinit var container: AppContainer
     lateinit var triviaPreferencesRepository: TriviaPreferencesRepository
-    lateinit var gameRepository: GameRepository
 
     override fun onCreate() {
         super.onCreate()

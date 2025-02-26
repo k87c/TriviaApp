@@ -26,6 +26,7 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.triviaapp.model.Question
-
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,7 +46,6 @@ fun GameScreen(
 ) {
     // Game view model
     val gameViewState by gameViewModel.gameViewState.collectAsState()
-
     Scaffold (
         topBar = {
             // Game top bar
@@ -106,6 +106,15 @@ fun GameScreen(
                             gameViewModel.loadQuestions(playerName,quantity, category)
                                       },
                         record = gameViewState.actualRecord,
+                        onGoToRecords = { gameViewModel.onGoToRecords() }
+                    )
+                }
+                GameUiState.Records -> {
+                    // Records state
+                    RecordsScreen(
+                        recordsByCategory = gameViewState.recordsByCategory,
+                        allGames = gameViewState.allGames,
+                        onBack = { gameViewModel.onBackToHome() },
                     )
                 }
                 GameUiState.Loading -> {
@@ -128,6 +137,7 @@ fun GameScreen(
                         onNextQuestion = { gameViewModel.onNextQuestion()},
                         onRestartGame = { gameViewModel.onRestartGame() },
                         onBackToHome = { gameViewModel.onBackToHome() },
+                        onGoToRecords = { gameViewModel.onGoToRecords() },
                     )
                 }
             }
@@ -146,6 +156,7 @@ fun GameZone(
     onNextQuestion: () -> Unit,
     onRestartGame: () -> Unit,
     onBackToHome: () -> Unit,
+    onGoToRecords: () -> Unit,
 ) {
     // Game zone
     Column (
@@ -183,6 +194,7 @@ fun GameZone(
                 newRecord = newRecord,
                 onRestartGame = onRestartGame,
                 onBackToHome = { onBackToHome() },
+                onGoToRecords = { onGoToRecords() },
             )
         } else {
             // Next button
@@ -211,6 +223,7 @@ private fun FinalScoreDialog(
     newRecord: Boolean,
     onRestartGame: () -> Unit,
     onBackToHome: () -> Unit,
+    onGoToRecords: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BasicAlertDialog(
@@ -239,6 +252,12 @@ private fun FinalScoreDialog(
                         color = MaterialTheme.colorScheme.secondary,
                     )
                 }
+                TextButton(
+                    onClick = { onGoToRecords() },
+                    modifier = Modifier.padding(8.dp),
+                ) {
+                    Text("See Records")
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
@@ -256,6 +275,7 @@ private fun FinalScoreDialog(
                     ) {
                         Text("Go to Home")
                     }
+
                 }
             }
         }
@@ -270,6 +290,7 @@ fun FinalScoreDialogPreview() {
         newRecord = true,
         onRestartGame = {},
         onBackToHome = {},
+        onGoToRecords = {},
     )
 }
 
