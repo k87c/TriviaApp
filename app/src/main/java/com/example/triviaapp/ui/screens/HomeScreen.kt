@@ -78,6 +78,7 @@ fun HomeScreen(
             label = { Text("Player Name") },
             value = playerName,
             onValueChange = onChangePlayerName,
+            singleLine = true,
         )
         Box(
             modifier = Modifier.padding(top = 16.dp)
